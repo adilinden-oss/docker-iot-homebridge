@@ -28,3 +28,36 @@ services:
       timeout: 2s
     restart: unless-stopped
 
+  ts-homebridge:
+    image: tailscale/tailscale
+    container_name: ts-homebridge
+    hostname: iot-homebridge
+    environment:
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_AUTH_KEY=${TS_AUTH_KEY}
+    volumes:
+      - /dev/net/tun:/dev/net/tun
+      - ${PWD}/volumes/ts-homebridge/lib:/var/lib
+      # tailscaled.sock shared with caddy
+      - ${PWD}/volumes/ts-homebridge/run:/tmp
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+
+  caddy-homebridge:
+    image: caddy:latest
+    container_name: caddy-homebridge
+    depends_on:
+      - ts-homebridge
+    environment:
+      - CADDY_CERT_DOMAIN=${CADDY_CERT_DOMAIN}
+      - CADDY_UPSTREAM=${CADDY_UPSTREAM}
+    volumes:
+      - ${PWD}/config/caddy-homebridge/Caddyfile:/etc/caddy/Caddyfile
+      - ${PWD}/volumes/caddy-homebridge/data:/data
+      - ${PWD}/volumes/caddy-homebridge/config:/config
+      # tailscaled.sock shared with caddy
+      - ${PWD}/volumes/ts-homebridge/run:/var/run/tailscale
+    network_mode: service:ts-homebridge
+    restart: unless-stopped
+
