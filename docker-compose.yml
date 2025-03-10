@@ -31,10 +31,11 @@ services:
   ts-homebridge:
     image: tailscale/tailscale
     container_name: ts-homebridge
-    hostname: iot-homebridge
+    hostname: ${TS_HOSTNAME}
     environment:
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_AUTH_KEY=${TS_AUTH_KEY}
+      - TS_EXTRA_ARGS=${TS_EXTRA_ARGS}
     volumes:
       - /dev/net/tun:/dev/net/tun
       - ${PWD}/volumes/ts-homebridge/lib:/var/lib
