@@ -29,6 +29,7 @@ services:
     restart: unless-stopped
 
   ts-homebridge:
+    profiles: ["disabled"] # temporary disable
     image: tailscale/tailscale
     container_name: ts-homebridge
     hostname: ${TS_HOSTNAME}
@@ -46,6 +47,7 @@ services:
     restart: unless-stopped
 
   caddy-homebridge:
+    profiles: ["disabled"] # temporary disable
     image: caddy:latest
     container_name: caddy-homebridge
     depends_on:
